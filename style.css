@@ -1,3 +1,82 @@
-#root {
-  color: red;
+/* hello kristina write some css here thank you please horosho */
+
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Frank Ruhl Libre", sans-serif;
+}
+
+#container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(auto, 600px);
+  column-gap: 20px;
+  row-gap: 20px;
+  padding: 20px;
+  padding-top: 110px;
+  background-color: hsl(60, 10%, 90%);
+}
+
+.episode-container {
+  display: grid;
+  row-gap: 20px;
+  justify-items: center;
+  /* justify-content: center; */
+  /* align-items: start; */
+  align-content: start;
+
+  background-color: hsl(50, 50%, 95%);
+  border: 1px solid hsl(30, 20%, 80%);
+  border-radius: 20px;
+  /* border: 2px solid lime; */
+}
+
+.episode-title-container {
+  justify-self: stretch;
+  text-align: center;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 10px;
+  background-color: hsl(50, 50%, 85%);
+  border-bottom: 1px solid hsl(30, 20%, 80%);
+}
+
+.episode-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: hsl(22, 31%, 20%);
+  /* border: 1px solid orange; */
+}
+
+.episode-image {
+  display: block;
+  max-width: 250px;
+  border-radius: 10px;
+  /* border: 4px solid blue; */
+}
+
+.episode-summary {
+  /* border: 1px solid red; */
+  padding: 0 20px 20px 20px;
+}
+
+.footer-container {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.header-container{
+    position: fixed;
+    z-index: 1;
+    top:0;
+    padding:40px;
+    background: rgb(21, 105, 133);
+    text-align: center;
+    width:100%;
 }
