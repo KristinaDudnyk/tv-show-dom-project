@@ -1,3 +1,5 @@
+import { fetchAllShows, fetchAllEpisodes } from "./data/fetched-data.js"; 
+
 function makePageForEpisodes(episodeList) {
 
   console.log(episodeList);
@@ -50,8 +52,6 @@ function makeHeader(allEpisodes){
 
   // const searchDiv = document.cleateElement("div");
   const input = document.createElement("input");
-
-
   
   header.appendChild(input)
   // searchDiv.appendChild(input);
@@ -59,13 +59,20 @@ function makeHeader(allEpisodes){
   // header.appendChild(searchDiv);
   document.body.appendChild(header);
 }
-function setup() {
-  const allEpisodes = getAllEpisodes();
+
+
+async function initialise () {
+  const allShows = await fetchAllShows()
+  console.log(allShows);
+
+  const allEpisodes = await fetchAllEpisodes(82);
+  console.log(allEpisodes);
+
   makeHeader(allEpisodes);
   makePageForEpisodes(allEpisodes);
   makeFooter(allEpisodes);
 }
 
-window.onload = setup;
+window.onload = initialise;
 
 
