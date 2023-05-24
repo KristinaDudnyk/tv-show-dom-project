@@ -22,7 +22,39 @@ function episodesSearchBarFunction (allEpisodes) {
       // console.log(ep.id.includes(chosenOption))
       ep.id === chosenOption
     )
-    makePageForEpisodes(selectedEpisode)
+    function makePageForEpisode(selectedEpisode){
+      const containerElement = document.getElementById("container");
+      containerElement.innerHTML = "";
+
+      episodeList.forEach((episode) => {
+        
+        const episodeContainer = document.createElement("div");
+        episodeContainer.className = "episode-container";
+      
+        const episodeTitleContainer = document.createElement("div");
+        episodeTitleContainer.className = "episode-title-container";
+
+        const episodeTitle = document.createElement("h1");
+        episodeTitle.className = "episode-title";
+        episodeTitle.innerText = `${episode.name} S${episode.season.toString().padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+
+        episodeTitleContainer.appendChild(episodeTitle);
+        
+        const episodeImage = document.createElement("img");
+        episodeImage.className = "episode-image";
+        episodeImage.src = episode.image.medium;
+        
+        const episodeSummary = document.createElement("div");
+        episodeSummary.className = "episode-summary";
+        episodeSummary.innerHTML = episode.summary;
+
+        episodeContainer.appendChild(episodeTitleContainer);
+        episodeContainer.appendChild(episodeImage);
+        episodeContainer.appendChild(episodeSummary);
+
+        containerElement.appendChild(episodeContainer);
+      });
+    }
   })
   
   selectEpisodeContainer.appendChild(selectElement)
@@ -154,3 +186,4 @@ async function initialise () {
 window.onload = initialise;
 
 
+//testing branch
