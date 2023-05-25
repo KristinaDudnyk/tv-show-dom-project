@@ -1,5 +1,39 @@
 import { fetchAllShows, fetchAllEpisodes } from "./data/fetched-data.js"; 
 
+let showId = 1;
+
+function selectShowFunction (allShows, allEpisodes) {
+  const selectShowContainer = document.createElement("div");
+
+  const selectElement = document.createElement("select");
+  selectElement.className = "select-element";
+  selectElement.id = "select-show-element";
+  selectElement.name = "shows";
+
+  for(let i = 0; i < allShows.length; i++) {
+    const optionElement = document.createElement("option");
+    optionElement.text = allShows[i].name;
+    optionElement.value = allShows[i].id;
+    selectElement.appendChild(optionElement);
+  }
+  console.log("selectElement shows",selectElement)
+
+  selectElement.addEventListener("change", event => {
+    const chosenOption = event.target.value;
+
+    const selectedShow = allShows.filter(show => show.id === parseFloat(chosenOption));
+    console.log("selectedShow", selectedShow);
+
+    showId = parseFloat(selectedShow[0].id);
+    console.log("showId f",showId);
+    
+    makePageForEpisodes(allEpisodes)
+  })
+  selectShowContainer.appendChild(selectElement)
+
+  return selectShowContainer
+}
+console.log("showId",showId)
 
 function episodesSearchBarFunction (allEpisodes) {
   const selectEpisodeContainer = document.createElement("div");
@@ -9,7 +43,7 @@ function episodesSearchBarFunction (allEpisodes) {
   selectElement.id = "select-element";
   selectElement.name = "episodes";
 
-  for(let i = 0; i < allEpisodes.length; i++){
+  for(let i = 0; i < allEpisodes.length; i++) {
     const optionElement = document.createElement("option");
     optionElement.text = `S${allEpisodes[i].season.toString().padStart(2, "0")}E${allEpisodes[i].number.toString().padStart(2, "0")} - ${allEpisodes[i].name}`;
     optionElement.value = allEpisodes[i].id;
@@ -19,9 +53,7 @@ function episodesSearchBarFunction (allEpisodes) {
   selectElement.addEventListener("change", (event) => {
     const chosenOption = event.target.value;
     console.log("chosenOption", chosenOption)
-    
-    // debugger
-
+  
     const selectedEpisode = allEpisodes.filter(ep => ep.id === parseInt(chosenOption))
     console.log("selectedEpisode",selectedEpisode)
     makePageForEpisodes(selectedEpisode)
@@ -70,13 +102,18 @@ function searcAndCountFunction (allEpisodes) {
 }
 
 
-function makeHeader(allEpisodes){
+function makeHeader(allEpisodes, allShows){
   const header = document.createElement("header");
   header.className = "header-container";
 
   const title = document.createElement("h1");
   title.className = "headers-title";
   title.textContent = "TV-DOM-PROJECT";
+
+  const selectShowMainContainer = document.createElement("div");
+  const selectShowContainer = selectShowFunction(allShows);
+  selectShowMainContainer.appendChild(selectShowContainer);
+  
 
   const selectEpisodeMainContainer = document.createElement("div");
   const selectEpisodeContainer = episodesSearchBarFunction(allEpisodes);
@@ -87,11 +124,13 @@ function makeHeader(allEpisodes){
   searcAndCountMainContainer.appendChild(searcAndCountContainer);
   
   header.appendChild(title);
-  header.appendChild(searcAndCountMainContainer);
+  header.appendChild(selectShowMainContainer);
   header.appendChild(selectEpisodeMainContainer);
-  
+  header.appendChild(searcAndCountMainContainer);
+
   document.body.appendChild(header);
 }
+console.log("showId",showId)
 
 
 function makePageForEpisodes(episodeList) {
@@ -128,6 +167,7 @@ function makePageForEpisodes(episodeList) {
   });
 }
 
+console.log("showId",showId)
 
 
 function makeFooter(allEpisodes) {
@@ -142,16 +182,18 @@ function makeFooter(allEpisodes) {
 
 
 async function initialise () {
-  // const allShows = await fetchAllShows()
-  // console.log(allShows);
+  const allShows = await fetchAllShows()
+  console.log(allShows);
 
-  const allEpisodes = await fetchAllEpisodes(82);
+  const allEpisodes = await fetchAllEpisodes(showId);
   console.log(allEpisodes);
 
-  makeHeader(allEpisodes);
+  makeHeader(allEpisodes, allShows);
   makePageForEpisodes(allEpisodes);
   makeFooter(allEpisodes);
 }
+console.log("showId",showId)
+
 
 window.onload = initialise;
 
