@@ -1,8 +1,6 @@
 import { fetchAllShows, fetchAllEpisodes } from "./data/fetched-data.js"; 
 
-let showId = 1;
-
-function selectShowFunction (allShows, allEpisodes) {
+ function buildShowSelect () {
   const selectShowContainer = document.createElement("div");
 
   const selectElement = document.createElement("select");
@@ -10,46 +8,72 @@ function selectShowFunction (allShows, allEpisodes) {
   selectElement.id = "select-show-element";
   selectElement.name = "shows";
 
-  for(let i = 0; i < allShows.length; i++) {
-    const optionElement = document.createElement("option");
-    optionElement.text = allShows[i].name;
-    optionElement.value = allShows[i].id;
-    selectElement.appendChild(optionElement);
-  }
-  console.log("selectElement shows",selectElement)
-
-  selectElement.addEventListener("change", event => {
-    const chosenOption = event.target.value;
-
-    const selectedShow = allShows.filter(show => show.id === parseFloat(chosenOption));
-    console.log("selectedShow", selectedShow);
-
-    showId = parseFloat(selectedShow[0].id);
-    console.log("showId f",showId);
-    
-    makePageForEpisodes(allEpisodes)
-  })
   selectShowContainer.appendChild(selectElement)
 
   return selectShowContainer
 }
-console.log("showId",showId)
 
-function episodesSearchBarFunction (allEpisodes) {
+function populateShowSelect(allShows) {
+  const selectElement = document.getElementById("select-show-element");
+  selectElement.innerHTML = "";
+
+  // for (let i = 0; i < allShows.length; i++) {
+  //   const optionElement = document.createElement("option");
+  //   optionElement.text = allShows[i].name;
+  //   optionElement.value = allShows[i].id;
+  //   selectElement.appendChild(optionElement);
+  // }
+
+  allShows.forEach((show) => {
+    const optionElement = document.createElement("option");
+    optionElement.text = show.name;
+    optionElement.value = show.id;
+    selectElement.appendChild(optionElement);
+  })
+
+  selectElement.addEventListener("change", async event => {
+    const chosenOption = event.target.value;
+    const selectedShow = allShows.filter(show => show.id === parseFloat(chosenOption));
+    const newShowId = parseFloat(selectedShow[0].id);
+    const newEpisodeList = await fetchAllEpisodes(newShowId); // blocking
+    // delete and repopulate the episodes select
+    populateEpisodesSelect(newEpisodeList);
+    // delete and repopulate the episodes page
+    makePageForEpisodes(newEpisodeList); // this will not run before the above is finished
+  })
+}
+
+function buildEpisodeSelect () {
   const selectEpisodeContainer = document.createElement("div");
 
   const selectElement = document.createElement("select");
   selectElement.className = "select-element";
-  selectElement.id = "select-element";
+  selectElement.id = "select-episode-element";
   selectElement.name = "episodes";
+  
+  selectEpisodeContainer.appendChild(selectElement)
+  return selectEpisodeContainer;
+}
 
-  for(let i = 0; i < allEpisodes.length; i++) {
+function populateEpisodesSelect(allEpisodes) {
+  const selectElement = document.getElementById("select-episode-element");
+  
+  selectElement.innerHTML = "";
+
+  // for(let i = 0; i < allEpisodes.length; i++) {
+  //   const optionElement = document.createElement("option");
+  //   optionElement.text = `S${allEpisodes[i].season.toString().padStart(2, "0")}E${allEpisodes[i].number.toString().padStart(2, "0")} - ${allEpisodes[i].name}`;
+  //   optionElement.value = allEpisodes[i].id;
+  //   selectElement.appendChild(optionElement);
+  // }
+
+  allEpisodes.forEach((episode) => {
     const optionElement = document.createElement("option");
-    optionElement.text = `S${allEpisodes[i].season.toString().padStart(2, "0")}E${allEpisodes[i].number.toString().padStart(2, "0")} - ${allEpisodes[i].name}`;
-    optionElement.value = allEpisodes[i].id;
+    optionElement.text = `S${episode.season.toString().padStart(2, "0")}E${episode.number.toString().padStart(2, "0")} - ${episode.name}`;
+    optionElement.value = episode.id;
     selectElement.appendChild(optionElement);
-  }
-  console.log(selectElement)
+  })
+
   selectElement.addEventListener("change", (event) => {
     const chosenOption = event.target.value;
     console.log("chosenOption", chosenOption)
@@ -58,14 +82,11 @@ function episodesSearchBarFunction (allEpisodes) {
     console.log("selectedEpisode",selectedEpisode)
     makePageForEpisodes(selectedEpisode)
   })
-  
-  selectEpisodeContainer.appendChild(selectElement)
-  return selectEpisodeContainer;
 }
 
-function searcAndCountFunction (allEpisodes) {
-  const searcAndCountContainer = document.createElement("div");
-  searcAndCountContainer.className = "searc-and-count-container";
+function searchAndCountFunction (allEpisodes) {
+  const searchAndCountContainer = document.createElement("div");
+  searchAndCountContainer.className = "search-and-count-container";
 
   const lebelForSearch = document.createElement("label");
   lebelForSearch.for = "search-input";
@@ -81,7 +102,7 @@ function searcAndCountFunction (allEpisodes) {
   countElementItem.textContent = `${allEpisodes.length}/${allEpisodes.length}`;
 
   countElementContainer.appendChild(countElementItem);
-  searcAndCountContainer.appendChild(countElementContainer);
+  searchAndCountContainer.appendChild(countElementContainer);
 
   searchInput.addEventListener("input", (e) => {
     const inputResult = e.target.value.trim();
@@ -96,13 +117,13 @@ function searcAndCountFunction (allEpisodes) {
 
     countElementItem.textContent = `${searchResult.length}/${allEpisodes.length}`;
   })
-  searcAndCountContainer.appendChild(searchInput);
+  searchAndCountContainer.appendChild(searchInput);
 
-  return searcAndCountContainer
+  return searchAndCountContainer
 }
 
 
-function makeHeader(allEpisodes, allShows){
+function makeHeader(allEpisodes){
   const header = document.createElement("header");
   header.className = "header-container";
 
@@ -110,27 +131,23 @@ function makeHeader(allEpisodes, allShows){
   title.className = "headers-title";
   title.textContent = "TV-DOM-PROJECT";
 
-  const selectShowMainContainer = document.createElement("div");
-  const selectShowContainer = selectShowFunction(allShows);
-  selectShowMainContainer.appendChild(selectShowContainer);
+  // const selectShowContainer = selectShowFunction(allShows, allEpisodes);
+  // const selectEpisodeContainer = episodesSearchBarFunction(allEpisodes);
   
+  const builtShowSelect = buildShowSelect();
+  const builtEpisodeSelect = buildEpisodeSelect();
 
-  const selectEpisodeMainContainer = document.createElement("div");
-  const selectEpisodeContainer = episodesSearchBarFunction(allEpisodes);
-  selectEpisodeMainContainer.appendChild(selectEpisodeContainer);
-  
-  const searcAndCountMainContainer = document.createElement("div");
-  const searcAndCountContainer = searcAndCountFunction(allEpisodes);
-  searcAndCountMainContainer.appendChild(searcAndCountContainer);
+  const searchAndCountContainer = searchAndCountFunction(allEpisodes);
   
   header.appendChild(title);
-  header.appendChild(selectShowMainContainer);
-  header.appendChild(selectEpisodeMainContainer);
-  header.appendChild(searcAndCountMainContainer);
+
+  header.appendChild(builtShowSelect);
+  header.appendChild(builtEpisodeSelect);
+
+  header.appendChild(searchAndCountContainer);
 
   document.body.appendChild(header);
 }
-console.log("showId",showId)
 
 
 function makePageForEpisodes(episodeList) {
@@ -167,8 +184,6 @@ function makePageForEpisodes(episodeList) {
   });
 }
 
-console.log("showId",showId)
-
 
 function makeFooter(allEpisodes) {
   const footer = document.createElement("footer");
@@ -183,17 +198,18 @@ function makeFooter(allEpisodes) {
 
 async function initialise () {
   const allShows = await fetchAllShows()
-  console.log(allShows);
+  // console.log(allShows);
+  const allEpisodes = await fetchAllEpisodes(1);
+  // console.log(allEpisodes);
 
-  const allEpisodes = await fetchAllEpisodes(showId);
-  console.log(allEpisodes);
+  makeHeader(allEpisodes);
 
-  makeHeader(allEpisodes, allShows);
-  makePageForEpisodes(allEpisodes);
+  populateShowSelect(allShows);
+  populateEpisodesSelect(allEpisodes);
+
+  makePageForEpisodes(allEpisodes); // populateEpisodesPage
   makeFooter(allEpisodes);
 }
-console.log("showId",showId)
-
 
 window.onload = initialise;
 
