@@ -15,7 +15,8 @@
   z-index: 1;
   top:0;
   padding:40px;
-  background: hsl(0, 0%, 12%);
+  /* background: hsl(0, 0%, 12%); */
+  background-color: lightgrey;
   width:100%;
 
 }
